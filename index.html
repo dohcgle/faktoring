@@ -110,6 +110,7 @@
         .text-green-600 { color: #16a34a; }
         .text-green-700 { color: #15803d; }
         .text-green-800 { color: #166534; }
+        .text-yellow-500 { color: #eab308; }
         .text-yellow-700 { color: #a16207; }
         .text-yellow-800 { color: #854d0e; }
         .text-red-600 { color: #dc2626; }
@@ -128,12 +129,14 @@
         .gap-6 { gap: 1.5rem; }
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
+        .flex-grow { flex-grow: 1; }
         .items-center { align-items: center; }
         .justify-center { justify-content: center; }
         .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
         .w-full { width: 100%; }
         .p-4 { padding: 1rem; }
+        .mr-3 { margin-right: 0.75rem; }
         .mb-2 { margin-bottom: 0.5rem; }
         .mb-3 { margin-bottom: 0.75rem; }
         .mb-4 { margin-bottom: 1rem; }
@@ -148,10 +151,36 @@
 
         /* --- Responsive Stillar --- */
         @media (min-width: 640px) {
-            #presentation-container { border-radius: 0.75rem; height: auto; min-height: 600px; }
+            #presentation-container {
+                border-radius: 0.75rem;
+                height: auto; /* PCda balandlik avtomatik bo'ladi */
+            }
             .container-wrapper { padding: 1rem; }
-            .slide { padding: 1.5rem; }
+            .slide-container {
+                height: auto;
+            }
+            .slide {
+                position: relative; /* PCda slaydlar oqimda bo'ladi */
+                display: none; /* Barcha slaydlar yashirin */
+                height: auto;
+                min-height: 600px;
+                overflow-y: hidden; /* Ichki aylantirishni o'chirish */
+                top: auto;
+                left: auto;
+                opacity: 1;
+                visibility: visible;
+                padding: 1.5rem;
+            }
+            .slide.active {
+                display: flex; /* Faqat aktiv slayd ko'rsatiladi */
+                animation: fadeInDesktop 0.4s ease-in-out;
+            }
+            @keyframes fadeInDesktop {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
         }
+        
         @media (min-width: 768px) {
             .slide { padding: 2rem; }
             .md-text-5xl { font-size: 3rem; line-height: 1; }
@@ -274,11 +303,37 @@
                 <!-- Slide 8: Natija -->
                 <div class="slide">
                     <div class="w-full">
-                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">Jarayon Natijasi</h2>
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center flex items-center justify-center">
+                            <svg class="icon-lg text-yellow-500 mr-3" style="width: 2.5rem; height: 2.5rem;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9a9.75 9.75 0 100-13.5h9a9.75 9.75 0 100 13.5zM16.5 18.75v-13.5" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75a9.75 9.75 0 00-9-5.25" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.875 13.5a9.75 9.75 0 019-5.25" />
+                            </svg>
+                            Jarayon Natijasi
+                        </h2>
                         <div class="grid grid-cols-1 md-grid-cols-3 gap-4 text-sm w-full">
-                            <div class="p-4 bg-green-50" style="border: 1px solid #bbf7d0; border-radius: 0.5rem;"><h3 class="font-bold text-green-800 mb-2">"Art-Plast" uchun foyda:</h3><p class="text-green-700">✓ 90 kun kutmasdan 450 mln so'mga ega bo'ldi.</p><p class="text-green-700">✓ Ishlab chiqarish uzluksizligini ta'minladi.</p><p class="text-red-600 mt-2">✗ Xizmat uchun 25 mln so'm to'ladi.</p></div>
-                            <div class="p-4 bg-blue-50" style="border: 1px solid #bfdbfe; border-radius: 0.5rem;"><h3 class="font-bold text-blue-800 mb-2">"Faktor Invest" uchun foyda:</h3><p class="text-blue-700">✓ O'z mablag'ini ishlatib, 25 mln so'm daromad oldi.</p><p class="text-blue-700">✓ Tavakkalchilikni boshqargani uchun komissiya oldi.</p></div>
-                            <div class="p-4 bg-gray-100" style="border: 1px solid #e5e7eb; border-radius: 0.5rem;"><h3 class="font-bold text-gray-800 mb-2">"Bunyodkor Qurilish" uchun:</h3><p class="text-gray-700">✓ Hech narsa o'zgarmadi.</p><p class="text-gray-700">✓ 90 kunlik to'lovni kechiktirish imkoniyatini saqlab qoldi.</p></div>
+                            <div class="p-4 bg-green-50 flex flex-col" style="border: 1px solid #bbf7d0; border-radius: 0.5rem;">
+                                <h3 class="font-bold text-green-800 mb-2">"Art-Plast" uchun foyda:</h3>
+                                <div class="flex-grow space-y-2">
+                                    <p class="text-green-700">✓ 90 kun kutmasdan 450 mln so'mga ega bo'ldi.</p>
+                                    <p class="text-green-700">✓ Ishlab chiqarish uzluksizligini ta'minladi.</p>
+                                </div>
+                                <p class="text-red-600 mt-2">✗ Xizmat uchun 25 mln so'm to'ladi.</p>
+                            </div>
+                            <div class="p-4 bg-blue-50 flex flex-col" style="border: 1px solid #bfdbfe; border-radius: 0.5rem;">
+                                <h3 class="font-bold text-blue-800 mb-2">"Faktor Invest" uchun foyda:</h3>
+                                <div class="flex-grow space-y-2">
+                                    <p class="text-blue-700">✓ O'z mablag'ini ishlatib, 25 mln so'm daromad oldi.</p>
+                                    <p class="text-blue-700">✓ Tavakkalchilikni boshqargani uchun komissiya oldi.</p>
+                                </div>
+                            </div>
+                            <div class="p-4 bg-gray-100 flex flex-col" style="border: 1px solid #e5e7eb; border-radius: 0.5rem;">
+                                <h3 class="font-bold text-gray-800 mb-2">"Bunyodkor Qurilish" uchun:</h3>
+                                <div class="flex-grow space-y-2">
+                                    <p class="text-gray-700">✓ Hech narsa o'zgarmadi.</p>
+                                    <p class="text-gray-700">✓ 90 kunlik to'lovni kechiktirish imkoniyatini saqlab qoldi.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
