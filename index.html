@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faktoring Jarayoni: Amaliy Misol</title>
+    <style>
+        /* --- Umumiy Stillar va Shriftlar --- */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f3f4f6; /* Kulrang fon */
+        }
+        
+        /* --- Asosiy Konteyner va Slayd Mexanikasi --- */
+        .container-wrapper {
+            width: 100%;
+            max-width: 1024px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        #presentation-container {
+            background-color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Mobil qurilmalarda to'liq ekran */
+        }
+        .slide-container {
+            flex-grow: 1;
+            position: relative;
+        }
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease-in-out;
+            overflow-y: auto;
+        }
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* --- Navigatsiya Paneli --- */
+        .navigation-bar {
+            background-color: #f9fafb;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .nav-button {
+            font-weight: 700;
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        #prevBtn { background-color: #d1d5db; color: #374151; }
+        #prevBtn:hover:not(:disabled) { background-color: #9ca3af; }
+        #prevBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #nextBtn { background-color: #4f46e5; color: #ffffff; }
+        #nextBtn:hover:not(:disabled) { background-color: #4338ca; }
+        #nextBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #slide-counter { font-size: 0.875rem; color: #4b5563; }
+
+        /* --- Matn va Rang stillari --- */
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-md { font-size: 1rem; line-height: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .font-light { font-weight: 300; }
+        
+        .bg-indigo-700 { background-color: #4338ca; }
+        .bg-indigo-600 { background-color: #4f46e5; }
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-green-50 { background-color: #f0fdf4; }
+        .bg-yellow-50 { background-color: #fefce8; }
+        .bg-gray-100 { background-color: #f3f4f6; }
+        .text-white { color: #ffffff; }
+        .text-indigo-200 { color: #c7d2fe; }
+        .text-indigo-800 { color: #3730a3; }
+        .text-blue-600 { color: #2563eb; }
+        .text-blue-800 { color: #1e40af; }
+        .text-green-600 { color: #16a34a; }
+        .text-green-700 { color: #15803d; }
+        .text-green-800 { color: #166534; }
+        .text-yellow-700 { color: #a16207; }
+        .text-yellow-800 { color: #854d0e; }
+        .text-red-600 { color: #dc2626; }
+        .text-gray-300 { color: #d1d5db; }
+        .text-gray-500 { color: #6b7280; }
+        .text-gray-600 { color: #4b5563; }
+        .text-gray-800 { color: #1f2937; }
+        
+        /* --- Komponent va Layout stillari --- */
+        .icon { width: 3rem; height: 3rem; margin-bottom: 0.5rem; }
+        .icon-lg { width: 4rem; height: 4rem; margin: auto; }
+        .info-box { margin-top: 1.5rem; padding: 1rem; border-radius: 0.5rem; max-width: 42rem; margin-left: auto; margin-right: auto; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .w-full { width: 100%; }
+        .p-4 { padding: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 0.75rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .list-disc { list-style-type: disc; }
+        .list-inside { list-style-position: inside; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        /* --- Responsive Stillar --- */
+        @media (min-width: 640px) {
+            #presentation-container { border-radius: 0.75rem; height: auto; min-height: 600px; }
+            .container-wrapper { padding: 1rem; }
+            .slide { padding: 1.5rem; }
+        }
+        @media (min-width: 768px) {
+            .slide { padding: 2rem; }
+            .md-text-5xl { font-size: 3rem; line-height: 1; }
+            .md-text-2xl { font-size: 1.5rem; line-height: 2rem; }
+            .md-text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+            .grid-cols-md-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .flex-md-row { flex-direction: row; }
+            .space-y-md-0 > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
+            .space-x-md-6 > :not([hidden]) ~ :not([hidden]) { margin-left: 1.5rem; }
+            .rotate-md-0 { transform: rotate(0deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-wrapper">
+        <div id="presentation-container">
+            <div class="slide-container">
+                <!-- Slide 1: Titul varag'i -->
+                <div class="slide active">
+                    <div class="bg-indigo-700 text-white text-center w-full h-full flex flex-col justify-center items-center p-4" style="border-radius: 0.5rem;">
+                        <h1 class="text-3xl md-text-5xl font-bold mb-3">Faktoring Jarayoni Amalda</h1>
+                        <p class="text-lg md-text-2xl font-light mb-8">Qanday ishlaydi? (Aniq misol bilan)</p>
+                        <div class="grid grid-cols-1 md-grid-cols-3 gap-6 w-full" style="max-width: 42rem;">
+                            <div class="p-4 bg-indigo-600" style="border-radius: 0.5rem;"><svg class="icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke-width:1.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-semibold text-md">Yetkazib beruvchi</h3><p class="text-indigo-200 text-sm">"Art-Plast" MChJ</p></div>
+                            <div class="p-4 bg-indigo-600" style="border-radius: 0.5rem;"><svg class="icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke-width:1.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-semibold text-md">Xaridor</h3><p class="text-indigo-200 text-sm">"Bunyodkor Qurilish" MChJ</p></div>
+                            <div class="p-4 bg-indigo-600" style="border-radius: 0.5rem;"><svg class="icon mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="stroke-width:1.5;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg><h3 class="font-semibold text-md">Faktor</h3><p class="text-indigo-200 text-sm">"Faktor Invest" MChJ</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Dastlabki holat -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">Dastlabki Holat (Shartnoma)</h2>
+                        <div class="flex flex-col md-flex-row items-center justify-center space-y-4 md-space-y-0 md-space-x-6 text-center">
+                            <div><h3 class="font-bold text-lg text-gray-800">"Art-Plast" MChJ</h3><p class="text-sm text-gray-500">(Yetkazib beruvchi)</p></div>
+                            <div style="transform: rotate(90deg);" class="text-2xl text-gray-300 rotate-md-0">→</div>
+                            <div style="padding: 1rem; border: 1px solid #bfdbfe; border-radius: 0.75rem;" class="w-full bg-blue-50"><p class="text-xl font-bold text-blue-800">500,000,000 so'm</p><p class="text-sm text-blue-600">mahsulot yetkazib beradi</p><p class="mt-1 text-red-600 font-semibold text-sm">To'lov: 90 kundan so'ng</p></div>
+                            <div style="transform: rotate(90deg);" class="text-2xl text-gray-300 rotate-md-0">→</div>
+                            <div><h3 class="font-bold text-lg text-gray-800">"Bunyodkor Qurilish"</h3><p class="text-sm text-gray-500">(Xaridor)</p></div>
+                        </div>
+                        <div class="info-box bg-yellow-50" style="border-color:#fde68a;"><h4 class="font-semibold text-yellow-800 text-center">Muammo:</h4><p class="text-sm text-yellow-700 text-center">"Art-Plast"ning puli 3 oyga "muzlab" qoldi, lekin xomashyo va oylik uchun hozir aylanma mablag' kerak.</p></div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: 1-2 Qadam -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">1-2 Qadam: Platformaga Murojaat</h2>
+                        <div class="flex flex-col items-center justify-center space-y-4">
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-bold text-lg mt-2">"Art-Plast"</h3></div>
+                            <div style="transform: rotate(90deg);" class="text-2xl text-gray-300">→</div>
+                            <div class="p-4 bg-gray-100" style="border-radius: 0.75rem; border: 1px solid #e5e7eb; text-align: center;"><svg class="icon" style="color: #6b7280; margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><h4 class="font-semibold mt-2">"Faktoring" Platformasi</h4></div>
+                        </div>
+                        <ul class="list-disc list-inside mt-6 space-y-2 text-sm text-gray-700" style="max-width: 42rem; margin-left: auto; margin-right: auto;"><li>"Art-Plast" platformaga ERI orqali kirib, yangi ariza yaratadi.</li><li>500 mln so'mlik hisobvaraq-fakturani yuklaydi.</li><li>Platforma fakturaning haqiqiyligini <strong>Soliq qo'mitasi</strong> bazasidan avtomatik tekshiradi.</li><li>Ariza barcha Faktorlar uchun ochiq bo'ladi.</li></ul>
+                    </div>
+                </div>
+                
+                <!-- Slide 4: 3-qadam -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">3-Qadam: Tahlil va Taklif</h2>
+                         <div class="flex flex-col md-flex-row items-center justify-center space-y-4 md-space-y-0 md-space-x-6">
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg><h3 class="font-bold text-lg mt-2">"Faktor Invest"</h3></div>
+                            <div class="transform rotate-90 md-rotate-0 text-2xl text-gray-300">→</div>
+                            <div class="text-center p-4 bg-green-50 w-full" style="border-radius: 0.75rem; border: 1px solid #bbf7d0;"><h4 class="font-semibold text-green-800 text-lg">Moliyaviy Taklif</h4><p class="text-lg mt-2 text-green-700"><strong>450 mln so'm</strong> (90%) darhol</p><p class="text-sm text-red-600 mt-1">Komissiya: <strong>25 mln so'm</strong> (5%)</p></div>
+                            <div class="transform rotate-90 md-rotate-0 text-2xl text-gray-300">→</div>
+                             <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-bold text-lg mt-2">"Art-Plast"</h3></div>
+                        </div>
+                        <p class="text-center text-sm text-gray-600 mt-6" style="max-width: 42rem; margin-left: auto; margin-right: auto;">"Faktor Invest" platforma orqali xaridorning ishonchliligini tekshiradi va o'z taklifini yuboradi.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 5: 4-qadam -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">4-Qadam: Kelishuv va Moliyalashtirish</h2>
+                        <div class="text-center p-4 bg-blue-50" style="border: 1px solid #bfdbfe; border-radius: 0.75rem; max-width: 32rem; margin-left: auto; margin-right: auto; margin-bottom: 1.5rem;"><p class="font-semibold text-sm text-blue-800">"Art-Plast" taklifni qabul qilib, shartnomani ERI bilan imzolaydi.</p></div>
+                        <div class="flex flex-col items-center justify-center space-y-4">
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg><h3 class="font-bold text-lg mt-2">"Faktor Invest"</h3></div>
+                            <div class="transform rotate-90 text-2xl text-gray-300">→</div>
+                            <div class="p-4 text-center"><p class="text-2xl font-bold text-green-600">450,000,000 so'm</p><p class="text-sm text-gray-600">pul o'tkazmasi</p></div>
+                            <div class="transform rotate-90 text-2xl text-gray-300">→</div>
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-bold text-lg mt-2">"Art-Plast"</h3></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: 5-qadam -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-4 text-center">5-Qadam: Qarzni Qaytarish</h2>
+                        <p class="text-center text-gray-500 mb-6 text-sm">(90 kundan so'ng)</p>
+                         <div class="flex flex-col items-center justify-center space-y-4">
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-bold text-lg mt-2">"Bunyodkor Qurilish"</h3></div>
+                            <div class="transform rotate-90 text-2xl text-gray-300">→</div>
+                            <div class="p-4 text-center"><p class="text-2xl font-bold text-green-600">500,000,000 so'm</p><p class="text-sm text-gray-600">to'liq qarzni to'laydi</p></div>
+                            <div class="transform rotate-90 text-2xl text-gray-300">→</div>
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg><h3 class="font-bold text-lg mt-2">"Faktor Invest"</h3></div>
+                        </div>
+                         <p class="text-center text-sm text-gray-600 mt-6" style="max-width: 42rem; margin-left: auto; margin-right: auto;">Xaridor o'z majburiyatini bajaradi va muddat kelganda to'lovni Faktorga o'tkazadi.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 7: 6-qadam -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">6-Qadam: Yakuniy Hisob-Kitob</h2>
+                         <div class="flex flex-col items-center justify-center space-y-4">
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg><h3 class="font-bold text-lg mt-2">"Faktor Invest"</h3></div>
+                            <div class="transform rotate-90 text-2xl text-gray-300">→</div>
+                            <div class="p-4 text-center"><p class="text-2xl font-bold text-green-600">25,000,000 so'm</p><p class="text-sm text-gray-600">qoldiq summani o'tkazadi</p></div>
+                            <div class="transform rotate-90 text-2xl text-gray-300">→</div>
+                            <div class="text-center"><svg class="icon-lg text-indigo-800" style="margin:auto;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg><h3 class="font-bold text-lg mt-2">"Art-Plast"</h3></div>
+                        </div>
+                        <div class="mt-6 p-4 bg-gray-100 rounded-lg text-sm" style="border: 1px solid #e5e7eb; max-width: 42rem; margin-left: auto; margin-right: auto;"><h4 class="font-semibold text-gray-800 text-center">Hisob-kitob:</h4><p class="text-gray-700 text-center">500 mln (kelib tushdi) - 450 mln (avans) - 25 mln (komissiya) = <span class="font-bold">25 mln (qoldiq)</span></p></div>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Natija -->
+                <div class="slide">
+                    <div class="w-full">
+                        <h2 class="text-2xl md-text-3xl font-bold text-indigo-800 mb-6 text-center">Jarayon Natijasi</h2>
+                        <div class="grid grid-cols-1 md-grid-cols-3 gap-4 text-sm w-full">
+                            <div class="p-4 bg-green-50" style="border: 1px solid #bbf7d0; border-radius: 0.5rem;"><h3 class="font-bold text-green-800 mb-2">"Art-Plast" uchun foyda:</h3><p class="text-green-700">✓ 90 kun kutmasdan 450 mln so'mga ega bo'ldi.</p><p class="text-green-700">✓ Ishlab chiqarish uzluksizligini ta'minladi.</p><p class="text-red-600 mt-2">✗ Xizmat uchun 25 mln so'm to'ladi.</p></div>
+                            <div class="p-4 bg-blue-50" style="border: 1px solid #bfdbfe; border-radius: 0.5rem;"><h3 class="font-bold text-blue-800 mb-2">"Faktor Invest" uchun foyda:</h3><p class="text-blue-700">✓ O'z mablag'ini ishlatib, 25 mln so'm daromad oldi.</p><p class="text-blue-700">✓ Tavakkalchilikni boshqargani uchun komissiya oldi.</p></div>
+                            <div class="p-4 bg-gray-100" style="border: 1px solid #e5e7eb; border-radius: 0.5rem;"><h3 class="font-bold text-gray-800 mb-2">"Bunyodkor Qurilish" uchun:</h3><p class="text-gray-700">✓ Hech narsa o'zgarmadi.</p><p class="text-gray-700">✓ 90 kunlik to'lovni kechiktirish imkoniyatini saqlab qoldi.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="navigation-bar">
+                <button id="prevBtn" class="nav-button">Олдинги</button>
+                <div id="slide-counter"></div>
+                <button id="nextBtn" class="nav-button">Кейинги</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideCounter = document.getElementById('slide-counter');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(n) {
+                slides.forEach((slide, index) => {
+                    if (index === n) {
+                        slide.classList.add('active');
+                    } else {
+                        slide.classList.remove('active');
+                    }
+                });
+                updateControls();
+            }
+
+            function updateControls() {
+                slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+                if (currentSlide === totalSlides - 1) {
+                    nextBtn.textContent = 'Якунлаш';
+                } else {
+                    nextBtn.textContent = 'Кейинги';
+                }
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
